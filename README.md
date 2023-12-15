@@ -1,7 +1,3 @@
-Certainly! Here's an example of a README file for an Automated Trading System:
-
----
-
 # Automated Trading System
 
 Welcome to the Automated Trading System (ATS) repository! This system is designed to facilitate automated trading in various financial markets using algorithmic strategies.
