@@ -21,6 +21,8 @@ except IOError:
 
 
 # establish MetaTrader 5 connection to a specified trading account
+    
+# add scheduler to further automate the system
 
 try:
     connection = mt5.initialize(path=path, login=int(key[0]), server=key[2], password=key[1])
