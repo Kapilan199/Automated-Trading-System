@@ -191,5 +191,3 @@ while time.time() <= timeout:
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
-
-
