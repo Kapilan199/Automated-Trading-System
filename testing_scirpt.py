@@ -1,5 +1,6 @@
 import MetaTrader5 as mt5
-
+import datetime as dt
+import pandas as pd
 symbol = "GBPUSD"
 
 symbol_info = mt5.symbol_info_tick(symbol).ask
