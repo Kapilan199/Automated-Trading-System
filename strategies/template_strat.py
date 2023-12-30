@@ -19,6 +19,14 @@ pos_size = 0.5 # max capital allocated/position size for any currency pair. in M
 
 
 
+
+
+
+
+
+
+
+
 # NOTE: COLLECT POSITIONS AND HISTORICAL DATA
 
 # Gets current positions
@@ -33,6 +41,11 @@ def get_position_df():
         pos_df = pd.DataFrame()
         
     return pos_df
+
+
+
+
+
 
 
 
@@ -74,6 +87,14 @@ def place_market_order(symbol,vol,buy_sell):
 
 
 
+
+
+
+
+
+
+
+
 # NOTE: TECHNICAL ANALYSIS
 
 
@@ -84,6 +105,19 @@ def calculate_ma(data, window=50):
     """
     data['MA'] = data['Close'].rolling(window=window).mean()
     return data
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
