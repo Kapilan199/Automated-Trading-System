@@ -9,7 +9,7 @@ symbol = "GBPUSD"
 
 
 def get_5m_candles(currency):
-    data = mt5.copy_rates_from(currency, mt5.TIMEFRAME_M5, dt.datetime.now() - dt.timedelta(10), 1250)   
+    data = mt5.copy_rates_from(currency, mt5.TIMEFRAME_M5, dt.datetime.now() - dt.timedelta(0), 250)   
     data_df = pd.DataFrame(data) 
     data_df.time = pd.to_datetime(data_df.time, unit="s")
     data_df.set_index("time", inplace=True)
