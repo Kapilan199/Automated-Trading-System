@@ -52,7 +52,7 @@ def get_position_df():
 
 # Gets historical data
 def get_5m_candles(currency):
-    data = mt5.copy_rates_from(currency, mt5.TIMEFRAME_M5, dt.datetime.now() - dt.timedelta(10), 250)   
+    data = mt5.copy_rates_from("GBPUSD", mt5.TIMEFRAME_M5, dt.datetime.now(), 250)   
     data_df = pd.DataFrame(data) 
     data_df.time = pd.to_datetime(data_df.time, unit="s")
     data_df.set_index("time", inplace=True)
@@ -62,9 +62,8 @@ def get_5m_candles(currency):
 
 
 
-
 # Places market orders
-def place_market_order(symbol,vol,buy_sell):
+def place_market_order(symbol,vol,buy_sell,sl,tp):
     if buy_sell.capitalize()[0] == "B":
         direction = mt5.ORDER_TYPE_BUY
         price = mt5.symbol_info_tick(symbol).ask
@@ -78,6 +77,8 @@ def place_market_order(symbol,vol,buy_sell):
         "volume": vol,
         "type": direction,
         "price": price,
+        "sl": sl,
+        "tp": tp,
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_RETURN,
     }
@@ -119,27 +120,47 @@ def calculate_ma(data, window=50):
 
 
 
-
-
 # NOTE: MAIN
 
 
 def main():
-    global pairs
+    pairs = "GBPUSD"
     positions = get_position_df()
+    ohlc = get_5m_candles(pairs)
+    ohlc = calculate_ma(ohlc)  # Calculate Moving Average
 
-    for currency in pairs:
-        ohlc = get_5m_candles(currency)
-        ohlc = calculate_ma(ohlc)  # Calculate Moving Average
+    # Calculate dynamic SL and TP based on moving average
+    if ohlc['Close'].iloc[-1] > ohlc['MA'].iloc[-1]:
+        sl = ohlc['MA'].iloc[-1] - (ohlc['Close'].iloc[-1] - ohlc['MA'].iloc[-1])
+        tp = ohlc['MA'].iloc[-1] + (ohlc['Close'].iloc[-1] - ohlc['MA'].iloc[-1])
 
-        if ohlc['Close'].iloc[-1] > ohlc['MA'].iloc[-1]:
-            # Place Buy Order
-            if len(positions) == 0 or currency not in positions['symbol'].values:
-                place_market_order(currency, pos_size, "Buy")
-        elif ohlc['Close'].iloc[-1] < ohlc['MA'].iloc[-1]:
-            # Place Sell Order
-            if len(positions) == 0 or currency not in positions['symbol'].values:
-                place_market_order(currency, pos_size, "Sell")
+        # Adjust SL and TP to meet minimum distance requirements
+        min_distance = 0.0020  # Example: Minimum distance required by the broker
+        if sl - ohlc['Close'].iloc[-1] < min_distance:
+            sl = ohlc['Close'].iloc[-1] - min_distance
+        if ohlc['MA'].iloc[-1] - tp < min_distance:
+            tp = ohlc['MA'].iloc[-1] + min_distance
+
+        # Place Buy Order with adjusted SL and TP
+        if len(positions) == 0 or pairs not in positions['symbol'].values:
+            print(place_market_order(pairs, pos_size, "Buy", sl, tp))
+            print("buy", pairs)
+    elif ohlc['Close'].iloc[-1] < ohlc['MA'].iloc[-1]:
+        sl = ohlc['MA'].iloc[-1] + (ohlc['MA'].iloc[-1] - ohlc['Close'].iloc[-1])
+        tp = ohlc['MA'].iloc[-1] - (ohlc['MA'].iloc[-1] - ohlc['Close'].iloc[-1])
+
+        # Adjust SL and TP to meet minimum distance requirements
+        min_distance = 0.0020  # Example: Minimum distance required by the broker
+        if ohlc['Close'].iloc[-1] - sl < min_distance:
+            sl = ohlc['Close'].iloc[-1] + min_distance
+        if tp - ohlc['MA'].iloc[-1] < min_distance:
+            tp = ohlc['MA'].iloc[-1] - min_distance
+
+        # Place Sell Order with adjusted SL and TP
+        if len(positions) == 0 or pairs not in positions['symbol'].values:
+            print(place_market_order(pairs, pos_size, "Sell", sl, tp))
+            print("sell ", pairs)
+
 
 
 
@@ -153,7 +174,7 @@ while time.time() <= timeout:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
       # time.sleep(300 - ((time.time() - starttime) % 300.0)) # 5 minute interval between each new execution
-        time.sleep(20 - ((time.time() - starttime) % 20.0)) # 1 minute interval between each new execution
+        time.sleep(10 - ((time.time() - starttime) % 10.0)) # 1/2 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
