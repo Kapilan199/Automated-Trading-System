@@ -1,9 +1,11 @@
+# this is script takes the moving average of stock based on the past 250 bars
+# it then places either a buy or sell order with an appropriate tp and sl
+
 import MetaTrader5 as mt5
 import numpy as np
 import pandas as pd
 import datetime as dt
 import time
-import copy
 
 # 1. get positions
 # 2. collect data
@@ -16,15 +18,6 @@ import copy
 
 pairs = 'GBPUSD' # currency pairs to be included in the strategy
 pos_size = 0.5 # max capital allocated/position size for any currency pair. in MT5 the size is in unit of 10^5
-
-
-
-
-
-
-
-
-
 
 
 # NOTE: COLLECT POSITIONS AND HISTORICAL DATA
@@ -41,13 +34,6 @@ def get_position_df():
         pos_df = pd.DataFrame()
         
     return pos_df
-
-
-
-
-
-
-
 
 
 # Gets historical data
@@ -88,14 +74,6 @@ def place_market_order(symbol,vol,buy_sell,sl,tp):
 
 
 
-
-
-
-
-
-
-
-
 # NOTE: TECHNICAL ANALYSIS
 
 
@@ -106,17 +84,6 @@ def calculate_ma(data, window=50):
     """
     data['MA'] = data['Close'].rolling(window=window).mean()
     return data
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -164,7 +131,6 @@ def main():
 
 
 
-
 # NOTE: SCHEDULER
 
 starttime=time.time()
@@ -174,6 +140,7 @@ while time.time() <= timeout:
         print("passthrough at ",time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
         main()
       # time.sleep(300 - ((time.time() - starttime) % 300.0)) # 5 minute interval between each new execution
+       # time.sleep(20 - ((time.time() - starttime) % 20.0)) # 1 minute interval between each new execution
         time.sleep(10 - ((time.time() - starttime) % 10.0)) # 1/2 minute interval between each new execution
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
