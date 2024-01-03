@@ -141,7 +141,9 @@ while time.time() <= timeout:
         main()
       # time.sleep(300 - ((time.time() - starttime) % 300.0)) # 5 minute interval between each new execution
        # time.sleep(20 - ((time.time() - starttime) % 20.0)) # 1 minute interval between each new execution
-        time.sleep(10 - ((time.time() - starttime) % 10.0)) # 1/2 minute interval between each new execution
+        # time.sleep(10 - ((time.time() - starttime) % 10.0)) # 1/2 minute interval between each new execution
+        time.sleep(1/3 - ((time.time() - starttime) % 1/3)) # 1 seconds interval between each new execution
+        
     except KeyboardInterrupt:
         print('\n\nKeyboard exception received. Exiting.')
         exit()
