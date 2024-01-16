@@ -14,7 +14,7 @@ import copy
 
 
 #defining strategy parameters
-pairs = ['EURUSD','GBPUSD','USDCHF','AUDUSD','USDCAD'] #currency pairs to be included in the strategy
+pairs = ['GBPUSD'] #currency pairs to be included in the strategy
 pos_size = 0.5 #max capital allocated/position size for any currency pair. in MT5 the size is in unit of 10^5
 
 
@@ -96,9 +96,13 @@ def place_market_order(symbol,vol,buy_sell):
     if buy_sell.capitalize()[0] == "B":
         direction = mt5.ORDER_TYPE_BUY
         price = mt5.symbol_info_tick(symbol).ask
+        sl = price - 0.001  # Set your desired SL for Buy orders
+        tp = price + 0.0001
     else:
         direction = mt5.ORDER_TYPE_SELL
         price = mt5.symbol_info_tick(symbol).bid
+        sl = price - 0.001  # Set your desired SL for Buy orders
+        tp = price + 0.0001
     
     request = {
         "action": mt5.TRADE_ACTION_DEAL,
@@ -106,6 +110,8 @@ def place_market_order(symbol,vol,buy_sell):
         "volume": vol,
         "type": direction,
         "price": price,
+        "sl": sl,
+        "tp": tp,
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_RETURN,
     }

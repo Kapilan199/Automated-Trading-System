@@ -3,13 +3,17 @@ import datetime as dt
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import talib
+
+
+dir(talib)
 
 
 symbol = "GBPUSD"
 
 
 def get_5m_candles(currency):
-    data = mt5.copy_rates_from(currency, mt5.TIMEFRAME_M5, dt.datetime.now() - dt.timedelta(0), 250)   
+    data = mt5.copy_rates_from(currency, mt5.TIMEFRAME_M1, dt.datetime.now(), 600)   
     data_df = pd.DataFrame(data) 
     data_df.time = pd.to_datetime(data_df.time, unit="s")
     data_df.set_index("time", inplace=True)
@@ -23,7 +27,7 @@ def get_5m_candles(currency):
 
 
 
-def calculate_ma(data, window=50):
+def calculate_ma(data, window=5):
     """
     Function to calculate the moving average
     """
